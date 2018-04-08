@@ -1,0 +1,194 @@
+swagger: '2.0'
+info:
+  description: OpenAPI Specification for the Apigee My Formatter target service endpoint.
+  version: 1.0.0
+  title: My Formatter Target API
+host: myFormatter.apigee.net
+schemes:
+  - http
+  - https
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication.
+paths:
+  /Formatter:
+    get:
+      summary: List of Operations
+      operationId: List of Operations
+      description: View help information about available operations as endpoints.
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Success
+  /convertJsonToXml:
+    post:
+      summary: Convert JSON to XML
+      operationId: Convert JSON to XML
+      description: Enpoint to convert JSON to XML.
+      produces:
+        - application/xml
+      parameters:
+        - name: jsonBody
+          in: query
+          description: json input.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+  /convertXmlToJson:
+    post:
+      summary: Convert XML to JSON
+      operationId: Convert XML to JSON
+      description: Enpoint to convert XML to JSON.
+      produces:
+        - application/json
+      parameters:
+        - name: xmlBody
+          in: query
+          description: Xml input.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+  '/jsonEvaluator{searchKey}':
+    post:
+      summary: Evaluate Json
+      operationId: Evaluate Json
+      description: find value based on a key in JSON.
+      produces:
+        - text/plain
+      parameters:
+        - name: searchKey
+          in: path
+          description: key.
+          required: true
+          type: string
+        - name: jsonBody
+          in: query
+          description: Json input.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+  /jsonFormatter:
+    post:
+      summary: Format JSON
+      operationId: Format JSON
+      description: Format JSON.
+      produces:
+        - application/json
+      parameters:
+        - name: stringToFormat
+          in: query
+          description: unformatted input.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+  '/jsonPath{jsonBody}':
+    post:
+      summary: JSON Path
+      operationId: JSON Path
+      description: List the values when a query is searched.
+      produces:
+        - application/json
+      parameters:
+        - name: jsonBody
+          in: path
+          description: JSON Input.
+          required: true
+          type: string
+        - name: jsonQuery
+          in: query
+          description: query to search.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+  /jsonToSingleLine:
+    post:
+      summary: Convert JSON to Single Line
+      operationId: Convert JSON to Single Line
+      description: Enpoint to convert XML to JSON.
+      produces:
+        - text/plain
+      parameters:
+        - name: formatted
+          in: query
+          description: json input.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+  /jsonToYaml:
+    post:
+      summary: Convert JSON to YAML
+      operationId: Convert JSON to YAML
+      description: Enpoint to convert JSON to YAML.
+      produces:
+        - text/plain
+      parameters:
+        - name: jsonBody
+          in: query
+          description: json input.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+  /xmlFormatterAndDecoder:
+    post:
+      summary: View status code and message
+      operationId: View status code and message
+      description: View status code and message for the specified value.
+      produces:
+        - application/xml
+      parameters:
+        - name: stringToFormat
+          in: query
+          description: HTTP status code.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+  /xmlToSingleLine:
+    post:
+      summary: Convert XML to Single Line
+      operationId: Convert XML to Single Line
+      description: Endpoint to Convert XML to Single Line.
+      produces:
+        - text/plain
+      parameters:
+        - name: formatted
+          in: query
+          description: XML input.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
+  /yamlToJson:
+    post:
+      summary: Convert YAML to JSON
+      operationId: Convert YAML to JSON
+      description: Endpoint to Convert YAML to JSON.
+      produces:
+        - application/json
+      parameters:
+        - name: formatted
+          in: query
+          description: XML input.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Success
