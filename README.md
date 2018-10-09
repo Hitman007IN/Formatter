@@ -9,3 +9,5 @@ Run the maven project
 Type http://localhost:8099/swagger-ui.html#
 
 The first endpoint /formatter displays all the endpoints with spring hateos
+
+![alt text](https://github.com/Hitman007IN/Formatter/blob/master/Swagger%20page%201.PNG)
