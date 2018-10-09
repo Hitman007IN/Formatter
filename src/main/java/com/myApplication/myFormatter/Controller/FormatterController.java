@@ -1,24 +1,18 @@
 package com.myApplication.myFormatter.Controller;
 
-import java.util.ArrayList;
-import java.util.List;
 import lombok.Setter;
-import net.minidev.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import springfox.documentation.annotations.ApiIgnore;
@@ -49,6 +43,7 @@ public class FormatterController {
 		Link singleLineXml = linkTo(methodOn(FormatterController.class).singleLineXml(null)).withRel("XmlToSingleLine");
 		Link yamlToJson = linkTo(methodOn(FormatterController.class).yamlToJsonConverter(null)).withRel("YamlToJsonConverter");
 		Link jsonToYaml = linkTo(methodOn(FormatterController.class).jsonToYamlConverter(null)).withRel("JsonToYamlConverter");
+		Link jsonToPojo = linkTo(methodOn(FormatterController.class).jsonToPojoConverter(null, null, null, null)).withRel("JsonToPojoConverter");
 		Resource<String> resource = new Resource<String>(""
 				+ "1.SwaggerUrl, "
 				+ "2.Json To Xml Converter, "
@@ -61,7 +56,8 @@ public class FormatterController {
 				+ "9.XML Formatter, "
 				+ "10.Convert Xml to Single Line"
 				+ "11.YAML to JSON Converter"
-				+ "12.JSON to YAML Converter");
+				+ "12.JSON to YAML Converter"
+				+ "13.JSON to POJO Converter");
 		
 		resource.add(swaggerUrl);
 		resource.add(jsonToXmlConverter);
@@ -75,6 +71,7 @@ public class FormatterController {
 		resource.add(singleLineXml);
 		resource.add(yamlToJson);
 		resource.add(jsonToYaml);
+		resource.add(jsonToPojo);
 		
 		return resource;
 	}
@@ -161,7 +158,8 @@ public class FormatterController {
 		String singleLine = formatterService.formatXmlToSingleLine(formatted);
 		return respEntity.ok(singleLine);
 	}
-		
+	
+	//----------------------------------------------YAML Opertations---------------------------------------------------------------------------//
 	// @Endpoint 11 - convert YAML to JSON
 	@PostMapping(path = "/yamlToJson", consumes = MediaType.TEXT_PLAIN_VALUE, produces = "application/json")
 	public ResponseEntity<String> yamlToJsonConverter(@RequestBody String yamlBody) {
@@ -176,5 +174,14 @@ public class FormatterController {
 		ResponseEntity<String> respEntity = null;
 		String yamlResponse = formatterService.jsonToYamlConverter(jsonBody);
 		return respEntity.ok(yamlResponse);
+	}
+	
+	//----------------------------------------------JSON to Pojo Operation---------------------------------------------------------------------------//
+	// @Endpoint 12 - convert JSON to POJO
+	@PostMapping(path = "/jsonToPojo", consumes = "application/json", produces = MediaType.TEXT_PLAIN_VALUE)
+	public ResponseEntity<StringBuilder> jsonToPojoConverter(@RequestBody String jsonBody, @RequestParam String jsonPropertyNeeded, @RequestParam String className, @RequestParam String packageName) {
+		ResponseEntity<String> respEntity = null;
+		StringBuilder response  = formatterService.jsonToPojoConverter(jsonBody, jsonPropertyNeeded, className, packageName);
+		return respEntity.ok(response);
 	}
 }
