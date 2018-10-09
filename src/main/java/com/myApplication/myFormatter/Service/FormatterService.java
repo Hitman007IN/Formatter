@@ -3,6 +3,8 @@ package com.myApplication.myFormatter.Service;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +25,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import com.myApplication.myFormatter.App;
+import org.json.JSONArray;
+import org.apache.commons.lang3.StringUtils;
 
 @Configuration
 public class FormatterService {
@@ -172,4 +175,122 @@ public class FormatterService {
 
         return jsonAsYaml;
 	}
+	
+	public StringBuilder jsonToPojoConverter(String jsonBody, String jsonPropertyNeeded, String className, String packageName){
+		
+		JsonParser parser = new JsonParser();
+        JsonElement element = parser.parse(jsonBody);
+        
+        JSONObject jsonObject = null;
+		try {
+			jsonObject = new JSONObject(jsonBody);
+		} catch (JSONException e1) {
+			_logger.debug("JSONException during jsonToPojoConverter jsonObject");
+		}
+        
+        Iterator<?> keys = jsonObject.keys();
+        
+        Map<String, String> pojoCollection = new HashMap<String, String>();
+
+	    while( keys.hasNext() ) {
+	        String key = (String)keys.next();
+	        
+	        if (element.isJsonObject()) {
+	            
+	            Object aObj = null;
+				try {
+					aObj = jsonObject.get(key);
+				} catch (JSONException e) {
+					_logger.debug("JSONException during jsonToPojoConverter aObj");
+				}
+	            if(aObj instanceof Integer){
+	            	pojoCollection.put(key, "Integer");
+	            }else if(aObj instanceof String){
+	            	pojoCollection.put(key, "String");
+	            }else if(aObj instanceof Boolean){
+	            	pojoCollection.put(key, "Boolean");
+	            }else if(aObj instanceof Long){
+	            	pojoCollection.put(key, "Long");
+	            }else if(aObj instanceof JSONArray){
+	            	pojoCollection.put(key, StringUtils.capitalize(key)+"[]");
+	            }else if(aObj instanceof Number){
+	            	pojoCollection.put(key, "Double");
+	            }else if(aObj instanceof JSONObject) {
+	            	pojoCollection.put(key, StringUtils.capitalize(key));
+	            }else{
+	            	pojoCollection.put(key, "String");
+	            }
+	        }
+	    } 
+	    
+	    return generatePojo(pojoCollection, jsonPropertyNeeded, className, packageName);
+	}
+	
+public StringBuilder generatePojo(Map<String, String> pojoCollection, String jsonPropertyNeeded, String className, String packageName) {
+		
+    	StringBuilder pojoGen = new StringBuilder();
+    	String header = "package "+packageName+";\n"+"\n";
+    	String ClassName = "public class "+className+"{"+"\n";
+    	String body = null;
+    	String jsonPropertyInclude = null;
+    	StringBuilder bodyBuilder = new StringBuilder();
+    	
+    	for (Map.Entry<String, String> entry : pojoCollection.entrySet())
+	    {
+    		if("yes".equalsIgnoreCase(jsonPropertyNeeded)){
+    			jsonPropertyInclude = "@JsonProperty(\""+entry.getKey()+"\")";
+    	        body = "private "+entry.getValue()+" "+entry.getKey()+";";
+    	        bodyBuilder.append("\n"+jsonPropertyInclude+"\n"+body+"\n");
+    		}else{
+    	        body = "private "+entry.getValue()+" "+entry.getKey()+";";
+    	        bodyBuilder.append("\n"+body+"\n");
+    		}
+	    }
+    	
+    	StringBuilder setterGetterBuilder = new StringBuilder();
+    	String getBody = null;
+    	String getThisBody = null;
+    	String setBody = null;
+    	String setThisBody = null;
+    	
+    	for (Map.Entry<String, String> entry : pojoCollection.entrySet())
+	    {
+    		getBody = "public "+entry.getValue()+" get"+StringUtils.capitalize(entry.getKey())+"(){"+"\n";
+    		getThisBody = "\t"+"return "+entry.getKey()+";\n"+"}"+"\n";
+    		
+    		setBody = "public void set"+StringUtils.capitalize(entry.getKey())+"("+entry.getValue()+" "+entry.getKey()+"){"+"\n";
+    		setThisBody = "\t"+"this."+entry.getKey()+" = "+entry.getKey()+";\n"+"}"+"\n";
+    		
+    		setterGetterBuilder.append("\n"+getBody+getThisBody+"\n"+setBody+setThisBody);
+	    }
+    	
+    	String footer = "\n}";
+    	
+    	if("yes".equalsIgnoreCase(jsonPropertyNeeded)){
+    		String jsonOrderPropertyStart = "@JsonPropertyOrder({";
+    		StringBuilder jsonOrderPropertyBody = new StringBuilder();
+    		int index = 0;
+    		for (Map.Entry<String, String> entry : pojoCollection.entrySet())
+    	    {
+    			if(index == 0) {
+    				jsonOrderPropertyBody.append("\""+entry.getKey()+"\"");
+    				index+=1;
+    				continue;
+    			}else
+    				jsonOrderPropertyBody.append(",\""+entry.getKey()+"\"");
+    			
+    			index+=1;
+    	    }
+    		String jsonOrderPropertyEnd = "})\n";
+    		String jsonInclude = "@JsonInclude(JsonInclude.Include.NON_EMPTY) \n";
+    		pojoGen.append(header+jsonOrderPropertyStart+jsonOrderPropertyBody.toString()+jsonOrderPropertyEnd+
+    				jsonInclude+ClassName+bodyBuilder.toString()+setterGetterBuilder.toString()+footer);
+    	}else {
+    		pojoGen.append(header+ClassName+bodyBuilder.toString()+setterGetterBuilder.toString()+footer);
+    	}
+    	
+    	
+    	return pojoGen;
+    	
+    }
 }
