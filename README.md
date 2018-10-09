@@ -10,5 +10,10 @@ Type http://localhost:8099/swagger-ui.html#
 
 The first endpoint /formatter displays all the endpoints with spring hateos
 
+Swagger API Home Page -
+
+![alt text](https://github.com/Hitman007IN/Formatter/blob/master/Swagger%20page%201.PNG)
+
 Json Tree WebPage - 
+
 ![alt text](https://github.com/Hitman007IN/Formatter/blob/master/JsonTree%20WebPage.PNG)
