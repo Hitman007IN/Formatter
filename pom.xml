@@ -13,7 +13,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<json-path.version>2.4.0</json-path.version>
-		<tomcat.version>9.0.14</tomcat.version>
+		<tomcat.version>10.0.4</tomcat.version>
 	</properties>
 
 	<parent>
